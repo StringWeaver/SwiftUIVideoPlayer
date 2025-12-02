@@ -15,7 +15,7 @@ struct DocumentView: View {
          Group {
             if selectedURL != nil {
                 PlayerView(url: $selectedURL)
-                    .ignoresSafeArea(.all)
+                    .ignoresSafeArea()
                     .onDisappear{ showPicker = true }
             } else {
                 Button("Select File") {

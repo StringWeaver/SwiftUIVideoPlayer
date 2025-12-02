@@ -11,7 +11,6 @@ import SwiftUI
 struct PlayerView: View {
     @Binding var url: URL?
     @State private var showCloseButton = false
-    @State private var filename : String = ""
     @StateObject  private var model = PlayerModel()
     
     var body: some View {
@@ -41,7 +40,7 @@ struct PlayerView: View {
                             showCloseButton = false
                         }
                     }
-                    Text(filename)
+                    Text(model.title)
                 }
             }
                 
@@ -53,6 +52,11 @@ struct PlayerView: View {
         }
         .task {
             model.load(url: url!)
+            #if os(macOS)
+            if let window = NSApp.keyWindow {
+                window.title = model.title
+            }
+            #endif
         }
         .simultaneousGesture(
             TapGesture()
@@ -63,20 +67,6 @@ struct PlayerView: View {
             }
         )
         .onDisappear { model.cleanup() }
-        .onAppear(){
-            filename = trimLeadingNonDigits(url!.lastPathComponent)
-            #if os(macOS)
-            if let window = NSApp.keyWindow {
-                window.title = filename
-            }
-            #endif
-        }
     }
-    private func trimLeadingNonDigits(_ input: String) -> String {
-        let digits = CharacterSet.decimalDigits
-        if let range = input.rangeOfCharacter(from: digits) {
-            return String(input[range.lowerBound...])
-        }
-        return input
-    }
+    
 }
